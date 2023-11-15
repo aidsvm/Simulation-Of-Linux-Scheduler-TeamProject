@@ -15,7 +15,7 @@ int main() {
 
     int i = 1;
     while(i <= 2){
-        string filename = "input" + to_string(i);
+        string filename = "inputs/input" + to_string(i);
         infile.open(filename);
 
     
