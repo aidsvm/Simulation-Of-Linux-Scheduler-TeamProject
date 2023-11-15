@@ -1,9 +1,8 @@
 #include <iostream>
+#include <queue>
 using namespace std;
 
 
 int main() {
-    std::cout << "Hello World" << std::endl;
-    cout << "I love boys!" << endl;
-    cout << "Hi" << endl;
+    
 }
