@@ -65,8 +65,11 @@ int main() {
         */
 
         for (int j = 0; j < m; j++) {
+            // retrieves next available thread from priority queue, top() returns smallest element since its min-heap.
             int nextThread = pq.top();
+            // removes the index of this thread from priority queue since it has been assigned to a job.
             pq.pop();
+            // determines start time for next job, calculates max between 0 or start time of next available thread.
             int startTime = max(0, pq.empty() ? 0 : pq.top());
             
         }
