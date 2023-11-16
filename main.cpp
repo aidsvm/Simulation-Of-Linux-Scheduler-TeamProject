@@ -33,6 +33,8 @@ int main() {
             }
     
             else{
+
+                times.clear();
                 //Adds all the times into the vector
                 while(iss >> t) {
                     times.push_back(t);
@@ -61,6 +63,15 @@ int main() {
             queue and keeps it out for t time and pushes that thread back
             into the queue when done
         */
+
+        for (int j = 0; j < m; j++) {
+            int nextThread = pq.top();
+            pq.pop();
+            int startTime = max(0, pq.empty() ? 0 : pq.top());
+            
+        }
+
+
 
         i++;
         infile.close();
