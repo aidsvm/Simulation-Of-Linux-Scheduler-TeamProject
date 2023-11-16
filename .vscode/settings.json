@@ -2,6 +2,7 @@
     "files.associations": {
         "queue": "cpp",
         "string": "cpp",
-        "bitset": "cpp"
+        "bitset": "cpp",
+        "iosfwd": "cpp"
     }
 }
