@@ -7,6 +7,26 @@
 using namespace std;
 
 
+struct Process{
+    int thread;
+    long int time;
+
+    Process();
+
+    Process(int thread){
+        this->thread = thread;
+        time = 0;
+    }
+
+    void assignTime(long int t){
+        time = t;
+    }
+
+    int nextAvailableThread(priority_queue<int, vector<int>, greater<int>> pq, vector<Process> processes){
+        
+    }
+};
+
 int main() {
     ifstream infile;
     ofstream outfile;
@@ -23,6 +43,7 @@ int main() {
         string line;
         int n, m, t;
         vector<long int> times;
+        vector<Process> processes;
 
         int lineNum = 0;
         while(getline(infile, line)) {
@@ -48,21 +69,21 @@ int main() {
             lineNum++;
         }
 
+        
         //Pushes n threads into the priority queue
         for(int i = 0; i < n; i++){
             pq.push(i);
+            Process process(i);
+            processes.push_back(process);
         }
+
 
         string outfilename = "output" + to_string(i) + ".a";
         outfile.open(outfilename);
 
-        /* 
-            Need to come up with a way to take the first thread and
-            allow it to run the first process. Then the second, and on.
-            We need to think of a function that pops a thread out of the
-            queue and keeps it out for t time and pushes that thread back
-            into the queue when done
-        */
+        //Calculate next aviable thread
+        //Function(pq, proccesses)
+        //  return procecesses.thread;
 
         for (int j = 0; j < m; j++) {
             // retrieves next available thread from priority queue, top() returns smallest element since its min-heap.
@@ -70,7 +91,7 @@ int main() {
             // removes the index of this thread from priority queue since it has been assigned to a job.
             pq.pop();
             // determines start time for next job, calculates max between 0 or start time of next available thread.
-            int startTime = max(0, pq.empty() ? 0 : pq.top());
+            processes[j]
             
         }
 
