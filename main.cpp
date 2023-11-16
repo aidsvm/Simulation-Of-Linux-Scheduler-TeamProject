@@ -11,7 +11,10 @@ struct Process{
     int thread;
     long int time;
 
-    Process();
+    Process(){
+        thread = -1;
+        time = 0;
+    }
 
     Process(int thread){
         this->thread = thread;
@@ -21,11 +24,17 @@ struct Process{
     void assignTime(long int t){
         time = t;
     }
-
-    int nextAvailableThread(priority_queue<int, vector<int>, greater<int>> pq, vector<Process> processes){
-        
-    }
 };
+
+int nextAvailableThread(priority_queue<int, vector<int>, greater<int>> pq, vector<Process> processes){
+    if (!pq.empty()){
+        int nextThread = pq.top();
+        pq.pop();
+        return nextThread;
+    }
+
+    return -1;
+}
 
 int main() {
     ifstream infile;
@@ -85,17 +94,18 @@ int main() {
         //Function(pq, proccesses)
         //  return procecesses.thread;
 
-        for (int j = 0; j < m; j++) {
-            // retrieves next available thread from priority queue, top() returns smallest element since its min-heap.
-            int nextThread = pq.top();
-            // removes the index of this thread from priority queue since it has been assigned to a job.
-            pq.pop();
-            // determines start time for next job, calculates max between 0 or start time of next available thread.
-            processes[j]
+        for (int i = 0; i < m; i++) {
+            int nextThread = nextAvailableThread(pq, processes);
+
             
+
+            if(nextThread != 1){
+                processes[nextThread].time = times[i];
+            }
+            else{
+                cout << "No available threads!" << endl;
+            }
         }
-
-
 
         i++;
         infile.close();
