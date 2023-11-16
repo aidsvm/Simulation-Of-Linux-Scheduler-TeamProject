@@ -97,17 +97,17 @@ int main() {
         for (int i = 0; i < m; i++) {
             int nextThread = nextAvailableThread(pq, processes);
 
-            
+            outfile << nextThread << " ";
 
-            if(nextThread != 1){
+            if(nextThread != -1){
                 processes[nextThread].time = times[i];
             }
-            else{
-                cout << "No available threads!" << endl;
-            }
+
+            outfile << processes[nextThread].time << endl;
         }
 
         i++;
+        outfile.close();
         infile.close();
     }
 }
