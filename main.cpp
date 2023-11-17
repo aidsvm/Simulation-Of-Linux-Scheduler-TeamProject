@@ -9,39 +9,44 @@ using namespace std;
 
 struct Process{
     int thread;
-    long int time;
-
-    Process(){
-        thread = -1;
-        time = 0;
-    }
+    long int time, time_elapsed, time_left;
 
     Process(int thread){
         this->thread = thread;
-        time = 0;
+        time = -1;
+        time_elapsed = -1;
+        time_left = -1;
     }
 
     void assignTime(long int t){
         time = t;
+        time_elapsed = -1;
+    }
+
+    void resetTime(){
+        time = -1;
+        time_left = -1;
+        time_elapsed = -1;
+    }
+
+    void updateTimeLeft(){
+        time_elapsed++;
+        time_left = time - time_elapsed;
     }
 };
 
-int nextAvailableThread(priority_queue<int, vector<int>, greater<int>> pq, vector<Process> processes){
-    if (!pq.empty()){
-        int nextThread = pq.top();
-        pq.pop();
-        return nextThread;
+struct CompareProcessByTime{
+    bool operator()(const Process& process_one, const Process& process_two) const {
+        return process_one.time_left > process_two.time_left;
     }
-
-    return -1;
-}
+};
 
 int main() {
     ifstream infile;
     ofstream outfile;
     //This is a priority queue with a min heap implementation
-    priority_queue<int, vector<int>, greater<int>> pq;
-
+    priority_queue<Process, vector<Process>, CompareProcessByTime> unused_threads;
+    priority_queue<Process, vector<Process>, CompareProcessByTime> used_threads;
 
     //While loops runs twice, once for each input
     int i = 1;
@@ -51,7 +56,7 @@ int main() {
 
         string line;
         int n, m, t;
-        vector<long int> times;
+        queue<long int> times;
         vector<Process> processes;
 
         int lineNum = 0;
@@ -59,19 +64,12 @@ int main() {
             istringstream iss(line);
             if(lineNum == 0){
                 iss >> n >> m;
-                cout << "Read numbers: " << n << " " << m << endl;
             }
     
             else{
-
-                times.clear();
                 //Adds all the times into the vector
                 while(iss >> t) {
-                    times.push_back(t);
-                }
-                //For loop just comfirms that the values are in the vector
-                for(int j = 0; j < m; j++) {
-                    cout << times[j] << " ";
+                    times.push(t);
                 }
             }
 
@@ -80,9 +78,9 @@ int main() {
 
         
         //Pushes n threads into the priority queue
-        for(int i = 0; i < n; i++){
-            pq.push(i);
-            Process process(i);
+        for(int j = 0; j < n; j++){
+            Process process(j);
+            unused_threads.push(process);
             processes.push_back(process);
         }
 
@@ -90,20 +88,47 @@ int main() {
         string outfilename = "output" + to_string(i) + ".a";
         outfile.open(outfilename);
 
-        //Calculate next aviable thread
-        //Function(pq, proccesses)
-        //  return procecesses.thread;
+        
 
-        for (int i = 0; i < m; i++) {
-            int nextThread = nextAvailableThread(pq, processes);
+        int j = 0;
+        while(1){
+            
+            if(!used_threads.empty()){
+                for(int currentThread = 0; currentThread < n; currentThread++){
+                    if(used_threads.top().time_left == 0){
+                        unused_threads.push(used_threads.top());
+                        used_threads.pop();
+                        processes[currentThread].resetTime();
+                    }
+                }
+            }
+            
 
-            outfile << nextThread << " ";
+            if(!unused_threads.empty()){
+                for(int currentThread = 0; currentThread < n; currentThread++){
+                    if(unused_threads.top().thread == currentThread && !times.empty()){
+                        outfile << currentThread << " ";
 
-            if(nextThread != -1){
-                processes[nextThread].time = times[i];
+                        processes[currentThread].assignTime(times.front());
+                        times.pop();
+
+                        used_threads.push(processes[currentThread]);
+                        unused_threads.pop();
+                        
+                        outfile << j << endl;
+                    }
+                }
             }
 
-            outfile << processes[nextThread].time << endl;
+            for(int currentThread = 0; currentThread < used_threads.size(); currentThread++){
+                processes[currentThread].updateTimeLeft();
+            }
+            
+            j++;
+
+            if(used_threads.empty() && times.empty())
+                break;
+        
         }
 
         i++;
