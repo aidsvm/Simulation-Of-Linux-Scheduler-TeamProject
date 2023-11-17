@@ -4,6 +4,7 @@
         "string": "cpp",
         "bitset": "cpp",
         "iosfwd": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "fstream": "cpp"
     }
 }
