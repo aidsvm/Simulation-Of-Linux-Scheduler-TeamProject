@@ -20,7 +20,7 @@ struct Process{
 
     void assignTime(long int t){
         time = t;
-        time_elapsed = 0;
+        time_elapsed = -1;
     }
 
     void resetTime(){
@@ -63,7 +63,7 @@ int main() {
         string line;
         int n, m, t;
         queue<long int> times;
-        vector<Process> processes;
+        vector<Process *> processes;
 
         int lineNum = 0;
         while(getline(infile, line)) {
@@ -85,9 +85,8 @@ int main() {
         
         //Pushes n threads into the priority queue
         for(int j = 0; j < n; j++){
-            Process process(j);
-            unused_threads.push(process);
-            processes.push_back(process);
+            processes.push_back(new Process(j));
+            unused_threads.push(*(processes.back()));
         }
 
         string outfilename = "output" + to_string(i) + ".a";
@@ -109,10 +108,10 @@ int main() {
                         //If the current thread is equal to the thread at the front of the PQ
                         if(currentThread == used_threads.top().thread){    
                             //Resets the time for the current thread
-                            processes[currentThread].resetTime();
+                            processes[currentThread]->resetTime();
                             
                             //Pushes the thread to unused thread PQ
-                            unused_threads.push(used_threads.top());
+                            unused_threads.push(*(processes[currentThread]));
                             
                             //Pops the thread from the used queue
                             used_threads.pop();
@@ -134,16 +133,16 @@ int main() {
 
                         //Sets the time of the processes vector with index currentThreat to the first time in 
                         // the times queue
-                        processes[currentThread].assignTime(times.front());
+                        processes[currentThread]->assignTime(times.front());
 
                         //Removes the first element in times queue
                         times.pop();
 
                         //Pushes the proccesses object into used_threads
-                        used_threads.push(processes[currentThread]);
+                        used_threads.push(*(processes[currentThread]));
 
                         //Removes it from unused_threads
-                        cout << unused_threads.empty() << endl;
+                        unused_threads.pop();
                         //Prints j/the time to the outfile
                         outfile << j << endl;
                     }
@@ -151,7 +150,7 @@ int main() {
             }
 
             for(int currentThread = 0; currentThread < n; currentThread++){
-                processes[currentThread].updateTimeLeft();
+                processes[currentThread]->updateTimeLeft();
             }
             
             j++;
