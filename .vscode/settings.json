@@ -3,6 +3,7 @@
         "queue": "cpp",
         "string": "cpp",
         "bitset": "cpp",
-        "iosfwd": "cpp"
+        "iosfwd": "cpp",
+        "iostream": "cpp"
     }
 }
