@@ -4,8 +4,47 @@
 #include <vector>
 #include <fstream>
 #include <sstream>
+#include <algorithm> 
 using namespace std;
 
+
+struct Process{
+    int thread;
+    int time;
+
+    Process();
+
+    Process(int thread){
+        this->thread = thread;
+        time = 0;
+    }
+
+    void assignTime(int t){
+        time = t;
+    }
+
+};
+
+ int nextAvailableThread(priority_queue<int, vector<int>, greater<int>> pq, vector<Process> processes){
+        if(!pq.empty()) {
+            int nextThread = pq.top();
+            pq.pop();
+            return nextThread;
+        }
+        else {
+            int shortestTime = 99999;
+            int nextThread = -1;
+
+            for (int k = 0; k < processes.size(); k++) {
+                const Process &p = processes[k];
+                if (p.time < shortestTime) {
+                    shortestTime = p.time;
+                    nextThread = p.thread;
+                }
+            }
+            return nextThread;
+        }
+    }
 
 int main() {
     ifstream infile;
@@ -23,6 +62,7 @@ int main() {
         string line;
         int n, m, t;
         vector<long int> times;
+        vector<Process> processes;
 
         int lineNum = 0;
         while(getline(infile, line)) {
@@ -48,30 +88,32 @@ int main() {
             lineNum++;
         }
 
+        
         //Pushes n threads into the priority queue
         for(int i = 0; i < n; i++){
             pq.push(i);
+            Process process(i);
+            processes.push_back(process);
         }
+
 
         string outfilename = "output" + to_string(i) + ".a";
         outfile.open(outfilename);
 
-        /* 
-            Need to come up with a way to take the first thread and
-            allow it to run the first process. Then the second, and on.
-            We need to think of a function that pops a thread out of the
-            queue and keeps it out for t time and pushes that thread back
-            into the queue when done
-        */
+        //Calculate next aviable thread
+        //Function(pq, proccesses)
+        //  return procecesses.thread;
 
         for (int j = 0; j < m; j++) {
-            int nextThread = pq.top();
-            pq.pop();
-            int startTime = max(0, pq.empty() ? 0 : pq.top());
+            // retrieves next available thread from priority queue, top() returns smallest element since its min-heap.
+            int nextThread = nextAvailableThread(pq, processes);
+            // determines start time for next job, calculates max between 0 or start time of next available thread.
+            processes[j].assignTime(max(0, processes[nextThread].time));
+            pq.push(nextThread);
+
+            outfile << nextThread << " " << processes[j].time << endl;
             
         }
-
-
 
         i++;
         infile.close();
