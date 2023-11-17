@@ -6,12 +6,12 @@
 #include <sstream>
 using namespace std;
 
-
-struct Process{
+// Struct to represent a process
+struct Process {
     int thread;
     long int time_needed, time_elapsed, time_left, time_started;
 
-    Process(int thread){
+    Process(int thread) {
         this->thread = thread;
         time_needed = -1;
         time_elapsed = -1;
@@ -19,38 +19,44 @@ struct Process{
         time_started = 0;
     }
 
-    void assignTime(long int t){
+    // Method to assign time to a process
+    void assignTime(long int t) {
         time_needed = t;
         time_elapsed = -1;
     }
 
-    void resetTime(){
+    // Method to reset time-related attributes of a process
+    void resetTime() {
         time_needed = -1;
         time_left = -1;
         time_elapsed = -1;
     }
 
-    void updateTimeLeft(){
+    // Method to update time_left for a process
+    void updateTimeLeft() {
         time_elapsed++;
         time_left = time_needed - time_elapsed;
     }
 
-    void newStartTime(long int new_time){
+    // Method to update the start time for a process
+    void newStartTime(long int new_time) {
         time_started += new_time;
     }
 };
 
-struct CompareProcessByTime{
+// Struct for comparing processes based on their remaining time
+struct CompareProcessByTime {
     bool operator()(const Process* process_one, const Process* process_two) const {
-        if(process_one->time_needed == process_two->time_needed){
+        if (process_one->time_needed == process_two->time_needed) {
             return process_one->thread > process_two->thread;
         }
-        
+
         return process_one->time_left > process_two->time_left;
     }
 };
 
-struct CompareProcessByThread{
+// Struct for comparing processes based on their thread number
+struct CompareProcessByThread {
     bool operator()(const Process* process_one, const Process* process_two) const {
         return process_one->thread > process_two->thread;
     }
@@ -59,13 +65,14 @@ struct CompareProcessByThread{
 int main() {
     ifstream infile;
     ofstream outfile;
-    //This is a priority queue with a min heap implementation
+
+    // Priority queues for unused and used threads with custom comparators
     priority_queue<Process*, vector<Process*>, CompareProcessByThread> unused_threads;
     priority_queue<Process*, vector<Process*>, CompareProcessByTime> used_threads;
 
-    //While loops runs twice, once for each input
+    // Loop for reading two input files
     int i = 1;
-    while(i <= 2){
+    while (i <= 2) {
         string filename = "inputs/input" + to_string(i);
         infile.open(filename);
 
@@ -75,16 +82,16 @@ int main() {
         vector<Process*> processes;
 
         int lineNum = 0;
-        while(getline(infile, line)) {
+        // Read input file line by line
+        while (getline(infile, line)) {
             istringstream iss(line);
-            if(lineNum == 0){
+            if (lineNum == 0) {
+                // Read the number of threads (n) and the number of times (m)
                 iss >> n >> m;
                 cout << n << " " << m << endl;
-            }
-    
-            else{
-                //Adds all the times into the vector
-                while(iss >> t) {
+            } else {
+                // Add all the times into the vector
+                while (iss >> t) {
                     times.push(t);
                 }
             }
@@ -92,10 +99,9 @@ int main() {
             lineNum++;
         }
 
-        
-        //Pushes n threads into the priority queue
-        for(int j = 0; j < n; j++){
-            Process *process = new Process(j);
+        // Push n threads into the priority queue
+        for (int j = 0; j < n; j++) {
+            Process* process = new Process(j);
             unused_threads.push(process);
             processes.push_back(process);
         }
@@ -103,74 +109,62 @@ int main() {
         string outfilename = "output" + to_string(i) + ".a";
         outfile.open(outfilename);
 
-        
-
         int j = 0;
-        while(j < m){
-            //For threads that are being used
-            // For threads that are being used
+        // Simulation loop for processing threads
+        while (j < m) {
+            // Process threads that are being used
             if (!used_threads.empty()) {
-                // Iterates through all threads
-                for (int currentThread = 0; currentThread < n; currentThread++){
-                    // If the thread at the front of the PQ has 0 time left
+                for (int currentThread = 0; currentThread < n; currentThread++) {
                     if (used_threads.top()->time_left == 0) {
-                        // If the current thread is equal to the thread at the front of the PQ
                         if (currentThread == used_threads.top()->thread) {
-                            // Pushes the thread to unused thread PQ
+                            // Push completed thread to unused thread queue
                             unused_threads.push(used_threads.top());
-
-                            // Pops the thread from the used queue
                             used_threads.pop();
-
-                            // Resets the time for the current thread
+                            // Reset time for the current thread
                             processes[currentThread]->resetTime();
                         }
                     }
                 }
             }
 
-            
-            //For unused_threads that are in use
-            if(!unused_threads.empty()){
-                //Iterates through these threads
-                for(int currentThread = 0; currentThread < n; currentThread++){
-                    
-                    //If the first thread of unused_threads is equal to currentThread and not empty
-                    if(unused_threads.top()->thread == currentThread && !times.empty()){
-
-                        //Print currentThread to the outfile
+            // Process unused threads
+            if (!unused_threads.empty()) {
+                for (int currentThread = 0; currentThread < n; currentThread++) {
+                    // If the first thread of unused_threads is equal to currentThread and not empty
+                    if (unused_threads.top()->thread == currentThread && !times.empty()) {
+                        // Print currentThread to the outfile
                         outfile << currentThread << " ";
-
-                        //Sets the time of the processes vector with index currentThreat to the first time in 
-                        // the times queue
+                        // Set the time of the processes vector with index currentThread to the first time in the times queue
                         processes[currentThread]->assignTime(times.front());
 
-                        if(j != 0){
+                        if (j != 0) {
+                            // Update start time for the process
                             processes[currentThread]->newStartTime(times.front());
-                            //Removes the first element in times queue
+                            // Remove the first element in times queue
                             times.pop();
                         }
 
-                        //Pushes the proccesses object into used_threads
+                        // Push the processes object into used_threads
                         used_threads.push(processes[currentThread]);
 
-                        //Removes it from unused_threads
+                        // Remove it from unused_threads
                         unused_threads.pop();
 
-                        //Prints j/the time to the outfile
+                        // Print j/the time to the outfile
                         outfile << processes[currentThread]->time_started << endl;
                     }
                 }
             }
 
-            for(int currentThread = 0; currentThread < n; currentThread++){
+            // Update time_left for all processes
+            for (int currentThread = 0; currentThread < n; currentThread++) {
                 processes[currentThread]->updateTimeLeft();
-                cout << used_threads.top()->thread << endl;
             }
-            
+
             j++;
         }
 
+        // Clean up allocated memory for processes
         for (Process* process : processes) {
             delete process;
         }
