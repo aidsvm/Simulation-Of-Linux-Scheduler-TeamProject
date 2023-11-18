@@ -115,6 +115,7 @@ int main()
         outfile.open(outfilename);
 
         int j = 0;
+<<<<<<< Updated upstream
         while (j < m)
         {
             // For threads that are being used
@@ -132,6 +133,23 @@ int main()
 
                     // Pops the thread from the used queue
                     used_threads.pop();
+=======
+        // Simulation loop for processing threads
+        while (j < m) {
+            // Process threads that are being used
+            if (!used_threads.empty()) {
+                for (int currentThread = 0; currentThread < n; currentThread++) {
+                    if (used_threads.top()->time_left == 0) {
+                        if (currentThread == used_threads.top()->thread) {
+                            // Push completed thread to unused thread queue
+                            unused_threads.push(used_threads.top());
+                            used_threads.pop();
+                            // Reset time for the current thread
+                            processes[currentThread]->resetTime();
+                            break;
+                        }
+                    }
+>>>>>>> Stashed changes
                 }
             }
 
@@ -143,9 +161,13 @@ int main()
                 {
 
                     // If the first thread of unused_threads is equal to currentThread and not empty
+<<<<<<< Updated upstream
                     if (unused_threads.top()->thread == currentThread && !times.empty())
                     {
 
+=======
+                    if (!unused_threads.empty() && unused_threads.top()->thread == currentThread && !times.empty()) {
+>>>>>>> Stashed changes
                         // Print currentThread to the outfile
                         outfile << currentThread << " ";
 
