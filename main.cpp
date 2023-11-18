@@ -73,7 +73,7 @@ int main() {
     // Loop for reading two input files
     int i = 1;
     while (i <= 2) {
-        string filename = "inputs/input" + to_string(i);
+        string filename = "input" + to_string(i);
         infile.open(filename);
 
         string line;
@@ -168,7 +168,15 @@ int main() {
         for (Process* process : processes) {
             delete process;
         }
-
+        
+        // Empties both priority queues
+        while(!used_threads.empty()){
+            used_threads.pop();
+        }
+        while(!unused_threads.empty()){
+            unused_threads.pop();
+        }
+        
         i++;
         outfile.close();
         infile.close();
