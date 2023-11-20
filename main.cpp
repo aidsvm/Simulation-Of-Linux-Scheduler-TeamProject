@@ -1,7 +1,7 @@
 #include <iostream>
-#include <queue>
 #include <string>
 #include <vector>
+#include <queue>
 #include <fstream>
 #include <sstream>
 using namespace std;
@@ -11,19 +11,21 @@ struct Process
     int thread;
     long int time;
 
-    //Constructor to make a Process object with passed in thread value/
+    // Constructor to make a Process object with passed in thread value/
     Process(int thread)
     {
         this->thread = thread;
         time = 0;
     }
 
-    //>Operator for this class, if both times are equal, return thread > other.thread
+    //>Operator for this class, if both times are equal, returns True 
+    // if the currentProcess's thread is smaller.
     bool operator>(const Process& other) const {
         if (time == other.time) {
             return thread > other.thread;
         }
-        //Else, return time > other.time
+        
+        // If times are different, returns True if currentProcess's time is shorter.
         return time > other.time;
     }
 };
@@ -48,9 +50,10 @@ int main()
         istringstream iss1(line);
         iss1 >> n >> m;
         
-        //Priority Queue, min-heap, takes in Process Objects
+        // Priority Queue, min-heap, takes in Process Objects
         priority_queue<Process, vector<Process>, greater<Process>> threads;
-        //Stores times, size m.
+
+        // Stores times, size m.
         vector<long long int> times(m);
 
         // Pushes n threads into the priority queue
@@ -72,7 +75,7 @@ int main()
         string outfilename = "output" + to_string(i) + ".a";
         outfile.open(outfilename);
 
-        //From 0 to m-1 processes, this will create a new Process object with 
+        // From 0 to m-1 processes, this will create a new Process object with 
         // the first thread available, it will then pop it out of the threads PQ.
         for(int i = 0; i < m; i++) {
             Process currentProcess = threads.top();
@@ -87,7 +90,9 @@ int main()
 
         }
         
+        // Increments the loop, goes to next input file/
         i++;
+        // Close out files.
         outfile.close();
         infile.close();
     }
